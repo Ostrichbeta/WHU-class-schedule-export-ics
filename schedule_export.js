@@ -507,8 +507,8 @@
       '    </div>' +
       '    <div class="form-group" style="padding-top: 2px;">' +
       '      <p for="none">' + ((scindex <= tcindex) ?
-      '运行说明：在上面选择开学第一周的任意日期（由周日开始周六结束算一周），然后在下方选择课表导出的语言，再按下「导出」即可将课表存为 .ics 的日历格式。繁体中文的课表由原始表经过 <a href="https://github.com/BYVoid/OpenCC">OpenCC</a> 程序转换得出，可能会有字符错误，请谅解。<br>本程序免费并在 GitHub 开放源代码。' :
-      '運行說明：在上面選擇開學第一週的任意日期（由週日開始週六結束為一週），然後在下方選擇課表匯出的語言，再按下「匯出」即可將課表存為 .ics 的日曆格式。繁體中文的課表由原始表經過 <a href="https://github.com/BYVoid/OpenCC">OpenCC</a> 程式轉換得出，可能會有字元錯誤，請諒解。<br>本程式免費並在 GitHub 開放原始碼。'
+      '运行说明：在上面选择开学第一周的任意日期（由周日开始周六结束算一周），然后在下方选择课表导出的语言，再按下「导出」即可将课表存为 .ics 的日历格式。繁体中文的课表由原始表经过 <a href="https://github.com/BYVoid/OpenCC">OpenCC</a> 程序转换得出，可能会有字符错误，请谅解。<br>本程序免费并在 <a href="https://github.com/Ostrichbeta/WHU-class-schedule-export-ics">GitHub</a> 开放源代码。' :
+      '運行說明：在上面選擇開學第一週的任意日期（由週日開始週六結束為一週），然後在下方選擇課表匯出的語言，再按下「匯出」即可將課表存為 .ics 的日曆格式。繁體中文的課表由原始表經過 <a href="https://github.com/BYVoid/OpenCC">OpenCC</a> 程式轉換得出，可能會有字元錯誤，請諒解。<br>本程式免費並在 <a href="https://github.com/Ostrichbeta/WHU-class-schedule-export-ics">GitHub</a> 開放原始碼。'
       ) + '</p>' +
       '    </div>' +
       '  </form>' +

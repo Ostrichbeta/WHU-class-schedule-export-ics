@@ -33,6 +33,7 @@
 - [jQuery](https://jquery.com/)
 - [Bootboxjs](http://bootboxjs.com/)
 - [OpenCC-js](https://github.com/nk2028/opencc-js)
+- [ics.js](https://github.com/nwcell/ics.js)
   
 ## 特别感谢
 

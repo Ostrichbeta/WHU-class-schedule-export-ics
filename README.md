@@ -33,6 +33,7 @@ Now your schedule is saved as an iCS calendar. You can import the file to your c
 - [jQuery](https://jquery.com/)
 - [Bootboxjs](http://bootboxjs.com/)
 - [OpenCC-js](https://github.com/nk2028/opencc-js)
+- [ics.js](https://github.com/nwcell/ics.js)
   
 ## Special Thanks
 
