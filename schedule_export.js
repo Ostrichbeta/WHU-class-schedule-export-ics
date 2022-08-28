@@ -1,20 +1,24 @@
 // ==UserScript==
-// @name         WHU Schedule Export as iCS Calendar
-// @name:zh      武大课程表导出为 iCS
-// @name:zh-TW   武大課程表匯出為 iCS
-// @namespace    https://github.com/Ostrichbeta/WHU-class-schedule-export-ics/raw/main/schedule_export.js
-// @version      0.89
-// @description  Export your timetable as ics format.
-// @author       Ostrichbeta Chan
-// @match        https://jwgl.whu.edu.cn/kbcx/xskbcx_cxXskbcxIndex.html*
-// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @require      https://code.jquery.com/jquery-3.6.1.min.js
-// @require      https://cdn.jsdelivr.net/npm/opencc-js@1.0.4/data.min.js
-// @require      https://cdn.jsdelivr.net/npm/opencc-js@1.0.4/data.cn2t.min.js
-// @require      https://cdn.jsdelivr.net/npm/opencc-js@1.0.4/bundle-browser.min.js
-// @require      https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js
-// @grant        none
-// @run-at       document-end
+// @name              WHU Schedule Export as iCS Calendar
+// @name:zh           武大课程表导出为 iCS
+// @name:zh-CN        武大课程表导出为 iCS
+// @name:zh-TW        武大課程表匯出為 iCS
+// @namespace         https://github.com/Ostrichbeta/WHU-class-schedule-export-ics/raw/main/schedule_export.js
+// @version           0.89
+// @description       Export your timetable as ics format.
+// @description:zh-CN 导出课表为 ics 格式
+// @description:zh-TW 匯出課表為 ics 格式
+// @author            Ostrichbeta Chan
+// @license           GPL-3.0
+// @match             https://jwgl.whu.edu.cn/kbcx/xskbcx_cxXskbcxIndex.html*
+// @icon              data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @require           https://code.jquery.com/jquery-3.6.1.min.js
+// @require           https://cdn.jsdelivr.net/npm/opencc-js@1.0.4/data.min.js
+// @require           https://cdn.jsdelivr.net/npm/opencc-js@1.0.4/data.cn2t.min.js
+// @require           https://cdn.jsdelivr.net/npm/opencc-js@1.0.4/bundle-browser.min.js
+// @require           https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js
+// @grant             none
+// @run-at            document-end
 // ==/UserScript==
 
 (function() {
