@@ -9,7 +9,7 @@ Languages: English | [簡體中文](README-SC.md) | [繁體中文](README-TC.md)
 ## Features
 
 - Chinese conversion support
-- Multi-timezone support (always return the right time no matter which zone you device in)
+- Multi-timezone support (always return at the right time no matter which zone your device is in)
 - No data upload, all the data is processed on your device
 
 ## How to Use
@@ -18,7 +18,7 @@ Languages: English | [簡體中文](README-SC.md) | [繁體中文](README-TC.md)
 
 ![](res/main_menu.png)
 
-2. If you have installed the plugin, there will be a new button called "```Export as iCS (导出iCS)```". Choose what data you want to show on your calendar by clicking the "```⚙```" icon on the left and selecting the items displayed on the screen. **The schedult WON'T export if you unselect the "```Time (时间)```" item!** After that, click the "```Export as iCS (导出iCS)```" button to open the export panel.
+2. If you have installed the plugin, there will be a new button called "```Export as iCS (导出iCS)```". Choose what data you want to show on your calendar by clicking the "```⚙```" icon on the left and selecting the items displayed on the screen. **The schedule WON'T export if you unselect the "```Time (时间)```" item!** After that, click the "```Export as iCS (导出iCS)```" button to open the export panel.
 
 ![](res/step1.png)
 
