@@ -2,7 +2,7 @@
 // @name         WHU Schedule Export as iCS Calendar
 // @name:zh      武大课程表导出为 iCS
 // @name:zh-TW   武大課程表匯出為 iCS
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/Ostrichbeta/WHU-class-schedule-export-ics/raw/main/schedule_export.js
 // @version      0.89
 // @description  Export your timetable as ics format.
 // @author       Ostrichbeta Chan
