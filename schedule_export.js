@@ -4,7 +4,7 @@
 // @name:zh-CN        武大课程表导出为 iCS
 // @name:zh-TW        武大課程表匯出為 iCS
 // @namespace         https://github.com/Ostrichbeta/WHU-class-schedule-export-ics/raw/main/schedule_export.js
-// @version           0.89
+// @version           0.89.1
 // @description       Export your timetable as ics format.
 // @description:zh-CN 导出课表为 ics 格式
 // @description:zh-TW 匯出課表為 ics 格式
@@ -454,30 +454,30 @@
   
   function get_start_time(week, day, no) {
     // Set the initial day to Sunday no matter whay day the start day is
-    let start_time = _termschedule_start;
+    let date = new Date(); // Get current timezone offset
+    let start_time = _termschedule_start + date.getTimezoneOffset() * 60 * 1000;
     start_time -= new Date(_termschedule_start).getDay() * 86400 * 1000;
     start_time += (week - 1) * 7 * 86400 * 1000;
     start_time += (day) * 86400 * 1000;
     let start_time_hhmm = _dayschedule[no]["start"].split(':');
     start_time += parseInt(start_time_hhmm[0]) * 3600 * 1000 + parseInt(start_time_hhmm[1]) * 60 * 1000;
-    let date = new Date();
     return new Date(start_time - 8 * 3600 * 1000 - date.getTimezoneOffset() * 60 * 1000);
   }
   
   function get_end_time(week, day, no) {
-    let end_time = _termschedule_start;
+    let date = new Date();
+    let end_time = _termschedule_start + date.getTimezoneOffset() * 60 * 1000;
     end_time -= new Date(_termschedule_start).getDay() * 86400 * 1000;
     end_time += (week - 1) * 7 * 86400 * 1000;
     end_time += (day) * 86400 * 1000;
     let end_time_hhmm = _dayschedule[no]["end"].split(':');
     end_time += parseInt(end_time_hhmm[0]) * 3600 * 1000 + parseInt(end_time_hhmm[1]) * 60 * 1000;
-    let date = new Date();
     return new Date(end_time - 8 * 3600 * 1000 - date.getTimezoneOffset() * 60 * 1000);
   }
   
   function get_end_of_week(week) {
     let date = new Date();
-    return new Date(_termschedule_start - (new Date(_termschedule_start).getDay() * 86400 * 1000) + (week) * 7 * 86400 * 1000 - 1 - 8 * 3600 * 1000 - date.getTimezoneOffset() * 60 * 1000);
+    return new Date(_termschedule_start + date.getTimezoneOffset() * 60 * 1000 - (new Date(_termschedule_start).getDay() * 86400 * 1000) + (week) * 7 * 86400 * 1000 - 1 - 8 * 3600 * 1000 - date.getTimezoneOffset() * 60 * 1000);
   }
   
   // Language Check
