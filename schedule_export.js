@@ -4,7 +4,7 @@
 // @name:zh-CN        武大课程表导出为 iCS
 // @name:zh-TW        武大課程表匯出為 iCS
 // @namespace         https://github.com/Ostrichbeta/WHU-class-schedule-export-ics/raw/main/schedule_export.js
-// @version           0.89.2
+// @version           0.89.2.1
 // @description       Export your timetable as ics format.
 // @description:zh-CN 导出课表为 ics 格式
 // @description:zh-TW 匯出課表為 ics 格式
@@ -538,7 +538,7 @@
             // Fetch the vertical list
             for (let i of $("#table2").children().eq(0).children()) {
               if ($("#table2").children().eq(0).children().eq(0).is(i)) continue; // Skip the first element
-              if(typeof($(i).attr("id")) === undefined) continue;
+              if(typeof($(i).attr("id")) == 'undefined') continue;
               let day_in_week = parseInt($(i).attr("id").split("_")[1]) == 7 ? 0 : parseInt($(i).attr("id").split("_")[1]);
               for (let j of $(i).children()) {
                 if ($(i).children().eq(0).is(j)) continue; // Skip the first element which is an indicator
