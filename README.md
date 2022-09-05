@@ -2,6 +2,17 @@
 
 Languages: English | [簡體中文](README-SC.md) | [繁體中文](README-TC.md)
 
+## Changelog
+### v0.90 - Sep 5, 2022
+- Add features: now you can add an alert time before the class, and can choose diffrently for the first class in the morning, afternoon and evening.
+
+### v0.89.2 - Sep 5, 2022
+- Fix bugs: Fix a crash happened when you have a class with unspecific time
+
+### v0.89.1 - Sep 2, 2022
+- Fix bugs: Fix the problem on the timezone offsets
+
+
 ## Introduction
 
 [WHU Class Schedule Export  as iCS](#) is a Tempermonky / Greasemonkey plugin which can help you export your class schedule to the calendar on your phone / pad / PC / Mac.
