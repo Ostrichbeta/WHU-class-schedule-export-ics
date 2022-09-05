@@ -4,11 +4,7 @@
 // @name:zh-CN        武大课程表导出为 iCS
 // @name:zh-TW        武大課程表匯出為 iCS
 // @namespace         https://github.com/Ostrichbeta/WHU-class-schedule-export-ics/raw/main/schedule_export.js
-<<<<<<< HEAD
 // @version           0.90
-=======
-// @version           0.89.2.1
->>>>>>> master
 // @description       Export your timetable as ics format.
 // @description:zh-CN 导出课表为 ics 格式
 // @description:zh-TW 匯出課表為 ics 格式
