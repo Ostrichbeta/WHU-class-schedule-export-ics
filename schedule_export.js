@@ -4,7 +4,7 @@
 // @name:zh-CN        武大课程表导出为 iCS
 // @name:zh-TW        武大課程表匯出為 iCS
 // @namespace         https://github.com/Ostrichbeta/WHU-class-schedule-export-ics/raw/main/schedule_export.js
-// @version           0.89.2.1
+// @version           0.90
 // @description       Export your timetable as ics format.
 // @description:zh-CN 导出课表为 ics 格式
 // @description:zh-TW 匯出課表為 ics 格式
@@ -191,6 +191,14 @@
     module.exports = saveAs;
   }
   
+  /* UUID genertor from https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid */
+
+  function uuidv4() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+
   /* global saveAs, Blob, BlobBuilder, console */
   /* exported ics */
   /* https://github.com/nwcell/ics.js */
@@ -241,7 +249,7 @@
        * @param  {string} begin       Beginning date of event
        * @param  {string} stop        Ending date of event
        */
-      'addEvent': function(subject, description, location, begin, stop, rrule) {
+      'addEvent': function(subject, description, location, begin, stop, rrule, valarm) {
         // I'm not in the mood to make these optional... So they are all required
         if (typeof subject === 'undefined' ||
           typeof description === 'undefined' ||
@@ -296,6 +304,20 @@
                   throw "Recurrence rrule 'byday' values must include only the following: 'SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'";
                 }
               }
+            }
+          }
+        }
+
+        // validate valarm
+        if (valarm && Object.keys(valarm).length != 0) {
+          if (valarm.trigger) {
+            if (isNaN(valarm.trigger) || !(typeof valarm.trigger === 'number')) {
+              throw "Trigger time must be an integer!"
+            }
+          }
+          if (valarm.description) {
+            if (!(typeof valarm.description === 'string')) {
+              throw "The description of valarm must be a string!"
             }
           }
         }
@@ -365,6 +387,22 @@
             }
           }
         }
+
+        var valarmArray = [];
+        var valarmString;
+        if (valarm && Object.keys(valarm).length != 0) {
+          let uuid = uuidv4();
+          valarmArray.push('BEGIN:VALARM');
+          valarmArray.push('X-WR-ALARMUID:' + uuid);
+          valarmArray.push('UID:' + uuid);
+          valarmArray.push('TRIGGER:-PT' + Math.floor(valarm.trigger).toString() + 'M');
+          valarmArray.push('ACTION:DISPLAY');
+          if (valarm.description) {
+            valarmArray.push('DESCRIPTION:' + valarm.description);
+          }
+          valarmArray.push('END:VALARM');
+          valarmString = valarmArray.join(SEPARATOR);
+        }
   
         var stamp = new Date().toISOString();
   
@@ -377,13 +415,17 @@
           'DTSTART;VALUE=DATE-TIME:' + start,
           'DTEND;VALUE=DATE-TIME:' + end,
           'LOCATION:' + location,
-          'SUMMARY;LANGUAGE=en-us:' + subject,
+          'SUMMARY:' + subject,
           'TRANSP:TRANSPARENT',
           'END:VEVENT'
         ];
   
         if (rruleString) {
           calendarEvent.splice(4, 0, rruleString);
+        }
+
+        if (valarm && Object.keys(valarm).length != 0) {
+          calendarEvent.splice(calendarEvent.length - 1, 0, valarmString);
         }
   
         calendarEvent = calendarEvent.join(SEPARATOR);
@@ -509,7 +551,55 @@
       '        <option value="zh-tc"' + ((scindex <= tcindex) ? "" : " selected") + '>' + ((scindex <= tcindex) ? "繁体中文" : "繁體中文") + '</option>' +
       '      </select>' +
       '    </div>' +
-      '    <div class="form-group" style="padding-top: 2px;">' +
+      '    <div class="form-group">' +
+      '      <div class="checkbox" id="hasAlarmSwitchDiv">' +
+      '          <label>' +
+      '              <input class="bootbox-input bootbox-input-checkbox" type="checkbox" id="hasAlarmSwitch">' +
+      '              ' + ((scindex <= tcindex) ? "设定上课前提醒" : "設定上課前提醒") +
+      '          </label>' +
+      '      </div>' +
+      '      <div id="alarm-panel" hidden>' +
+      '        <div class="checkbox" id="hasAlarmSwitchDiv" hidden>' +
+      '            <label>' +
+      '                <input class="bootbox-input bootbox-input-checkbox" type="checkbox" id="hasOtherIntervalForFirstClass">' +
+      '                ' + ((scindex <= tcindex) ? "第一节课另设提醒时间间隔" : "第一節課另設提醒時間間隔") +
+      '            </label>' +
+      '        </div>' +
+      '        <div class="row">' +
+      '            <div class="col-sm-3">' +
+      '                <div class="form-group">' +
+      '                    <label for="normal_trigger">' + ((scindex <= tcindex) ? "课前提醒" : "課前提醒") + '</label>' +
+      '                    <input type="number" class="bootbox-input-number form-control" id="normal_trigger" name="normal_trigger" value="15" min="0" max="1440"></input>' +
+      '                </div>' +
+      '            </div>' +
+      '            <div class="col-sm-3">' +
+      '                <div class="form-group">' +
+      '                    <label for="morning_first_class_trigger">' + ((scindex <= tcindex) ? "早上首节前提醒" : "早上首節前提醒") + '</label>' +
+      '                    <input type="number" disabled="true" class="bootbox-input-number form-control" id="morning_first_class_trigger" name="morning_first_class_trigger" value="15" min="0" max="1440"></input>' +
+      '                </div>' +
+      '            </div>' +
+      '            <div class="col-sm-3">' +
+      '                <div class="form-group">' +
+      '                    <label for="afternoon_first_class_trigger">' + ((scindex <= tcindex) ? "下午首节前提醒" : "下午首節前提醒") + '</label>' +
+      '                    <input type="number" disabled="true" class="bootbox-input-number form-control" id="afternoon_first_class_trigger" name="afternoon_first_class_trigger" value="15" min="0" max="1440"></input>' +
+      '                </div>' +
+      '            </div>' +
+      '            <div class="col-sm-3">' +
+      '                <div class="form-group">' +
+      '                    <label for="evening_first_class_trigger">' + ((scindex <= tcindex) ? "晚上首节前提醒" : "晚上首節前提醒") + '</label>' +
+      '                    <input type="number" disabled="true" class="bootbox-input-number form-control" id="evening_first_class_trigger" name="evening_first_class_trigger" value="15" min="0" max="1440"></input>' +
+      '                </div>' +
+      '            </div>' +
+      '        </div>' +
+      '        <div class="form-group" style="padding-top: 1px;">' +
+      '          <p for="none">' + ((scindex <= tcindex) ?
+      '提醒时间单位为分钟，范围 0~1440 ，如果设定为 0 则不提醒。' :
+      '提醒時間單位為分鐘，範圍 0~1440 ，如果設定為 0 則不提醒。'
+      ) + '      </p>' +
+      '        </div>' +
+      '      </div>'+
+      '    </div>' +
+      '    <div class="form-group" style="padding-top: 1px;">' +
       '      <p for="none">' + ((scindex <= tcindex) ?
       '运行说明：在上面选择开学第一周的任意日期（由周日开始周六结束算一周），然后在下方选择课表导出的语言，再按下「导出」即可将课表存为 .ics 的日历格式。繁体中文的课表由原始表经过 <a href="https://github.com/BYVoid/OpenCC">OpenCC</a> 程序转换得出，可能会有字符错误，请谅解。<br>本程序免费并在 <a href="https://github.com/Ostrichbeta/WHU-class-schedule-export-ics">GitHub</a> 开放源代码。' :
       '運行說明：在上面選擇開學第一週的任意日期（由週日開始週六結束為一週），然後在下方選擇課表匯出的語言，再按下「匯出」即可將課表存為 .ics 的日曆格式。繁體中文的課表由原始表經過 <a href="https://github.com/BYVoid/OpenCC">OpenCC</a> 程式轉換得出，可能會有字元錯誤，請諒解。<br>本程式免費並在 <a href="https://github.com/Ostrichbeta/WHU-class-schedule-export-ics">GitHub</a> 開放原始碼。'
@@ -518,6 +608,89 @@
       '  </form>' +
       '</div>'
     );
+
+    // Control the toggle of alarm panel
+    $("body").on('change', '#hasAlarmSwitch', function(){
+      if ($('#hasAlarmSwitch') && $('#alarm-panel')) {
+        if ($('#hasAlarmSwitch').is(":checked")) {
+          $('#alarm-panel').show();
+        }
+        else{
+          $('#alarm-panel').hide();
+        }
+      }
+    });
+
+    // Contol the toggle of unique interval for the first class
+    $("body").on('change', '#hasOtherIntervalForFirstClass', function(){
+      if ($('#hasOtherIntervalForFirstClass')) {
+        if ($('#hasOtherIntervalForFirstClass').is(":checked")) {
+          // Remove all the disability to edit other editboxes
+          if ($('#morning_first_class_trigger')) $('#morning_first_class_trigger').prop("disabled", false);
+          if ($('#afternoon_first_class_trigger')) $('#afternoon_first_class_trigger').prop("disabled", false);
+          if ($('#evening_first_class_trigger')) $('#evening_first_class_trigger').prop("disabled", false);
+        } else {
+          if ($('#morning_first_class_trigger')) $('#morning_first_class_trigger').prop("disabled", true);
+          if ($('#afternoon_first_class_trigger')) $('#afternoon_first_class_trigger').prop("disabled", true);
+          if ($('#evening_first_class_trigger')) $('#evening_first_class_trigger').prop("disabled", true);
+          // Reset all the values to the same as the first one
+          if ($("#morning_first_class_trigger")) $("#morning_first_class_trigger").val($('#normal_trigger').val());
+          if ($("#afternoon_first_class_trigger")) $("#afternoon_first_class_trigger").val($('#normal_trigger').val());
+          if ($("#evening_first_class_trigger")) $("#evening_first_class_trigger").val($('#normal_trigger').val());
+        }
+      }
+    });
+
+    // Control the sync of the edit box
+    $("body").on('change', '#normal_trigger', function(){
+      if ($('#normal_trigger')) {
+        if (parseInt($('#normal_trigger').val()) > 1440) {
+          $('#normal_trigger').val("1440");
+        }
+        if (parseInt($('#normal_trigger').val()) < 0 || $('#normal_trigger').val() == "") {
+          $('#normal_trigger').val("0");
+        }
+        if (!$("#hasOtherIntervalForFirstClass").is(":checked")) {
+          if ($("#morning_first_class_trigger")) $("#morning_first_class_trigger").val($('#normal_trigger').val());
+          if ($("#afternoon_first_class_trigger")) $("#afternoon_first_class_trigger").val($('#normal_trigger').val());
+          if ($("#evening_first_class_trigger")) $("#evening_first_class_trigger").val($('#normal_trigger').val());
+        }
+      }
+    });
+
+    // Ensure all the inputs are in the correct range
+    $("body").on('change', '#morning_first_class_trigger', function(){
+      if ($('#morning_first_class_trigger')) {
+        if (parseInt($('#morning_first_class_trigger').val()) > 1440) {
+          $('#morning_first_class_trigger').val("1440");
+        }
+        if (parseInt($('#morning_first_class_trigger').val()) < 0 || $('#morning_first_class_trigger').val() == "") {
+          $('#morning_first_class_trigger').val("0");
+        }
+      }
+    });
+
+    $("body").on('change', '#afternoon_first_class_trigger', function(){
+      if ($('#afternoon_first_class_trigger')) {
+        if (parseInt($('#afternoon_first_class_trigger').val()) > 1440) {
+          $('#afternoon_first_class_trigger').val("1440");
+        }
+        if (parseInt($('#afternoon_first_class_trigger').val()) < 0 || $('#afternoon_first_class_trigger').val() == "") {
+          $('#afternoon_first_class_trigger').val("0");
+        }
+      }
+    });
+
+    $("body").on('change', '#evening_first_class_trigger', function(){
+      if ($('#evening_first_class_trigger')) {
+        if (parseInt($('#evening_first_class_trigger').val()) > 1440) {
+          $('#evening_first_class_trigger').val("1440");
+        }
+        if (parseInt($('#evening_first_class_trigger').val()) < 0 || $('#evening_first_class_trigger').val() == "") {
+          $('#evening_first_class_trigger').val("0");
+        }
+      }
+    });
 
     bootbox.confirm({
       title: (scindex <= tcindex) ? "导出设置" : "匯出設定",
@@ -540,6 +713,9 @@
               if ($("#table2").children().eq(0).children().eq(0).is(i)) continue; // Skip the first element
               if(typeof($(i).attr("id")) == 'undefined') continue;
               let day_in_week = parseInt($(i).attr("id").split("_")[1]) == 7 ? 0 : parseInt($(i).attr("id").split("_")[1]);
+              let is_first_morning_class_set = false;
+              let is_first_afternoon_class_set = false;
+              let is_first_evening_class_set = false;
               for (let j of $(i).children()) {
                 if ($(i).children().eq(0).is(j)) continue; // Skip the first element which is an indicator
               
@@ -549,6 +725,7 @@
                 let Tbegin = "";
                 let Tend = "";
                 let Trrule = {};
+                let Tvalarm = {};
               
                 let single_class_obj = $(j).children().eq(1).children().eq(0);
               
@@ -585,13 +762,54 @@
                 }
               
                 if (Tbegin == "" || Tend == "") {
-                  //If the class week range is unknown, stop the process.
+                  // If the class week range is unknown, stop the process.
                   bootbox.alert({
                     title: (scindex <= tcindex) ? "错误" : "錯誤",
                     message: (scindex <= tcindex) ? "周数未显示，无法生成！\n脚本只能取得屏幕上所显示的信息，请通过点按左侧齿轮，在菜单中选中「时间」项开启。" : "週數未顯示，無法匯出！\n腳本只能取得螢幕上所顯示的資訊，請通過點按左側齒輪，在彈出選單中選中「時間」項開啟。",
                     size: 'small'
                   });
                   return;
+                }
+
+                // Check if the alarm switch is on, and check if this is the first class
+                if ($('#hasAlarmSwitch') && $('#hasAlarmSwitch').is(":checked")) {
+                  if (parseInt(class_duration_list[0]) >= 1 && parseInt(class_duration_list[0]) <= 5 && !is_first_morning_class_set) {
+                    // Class started in the morning
+                    is_first_morning_class_set = true;
+                    if (parseInt($("#morning_first_class_trigger").val()) != 0) {
+                      // Ignore the alarm if the trigger time is zero
+                      Tvalarm = {
+                        trigger: parseInt($("#morning_first_class_trigger").val()),
+                        description: "alarm-morning-first-class"
+                      };
+                    }
+                  } else if (parseInt(class_duration_list[0]) >= 6 && parseInt(class_duration_list[0]) <= 10 && !is_first_afternoon_class_set) {
+                    // Class started in the afternoon
+                    is_first_afternoon_class_set = true;
+                    if (parseInt($("#afternoon_first_class_trigger").val()) != 0) {
+                      Tvalarm = {
+                        trigger: parseInt($("#afternoon_first_class_trigger").val()),
+                        description: "alarm-afternoon-first-class"
+                      };
+                    }
+                  } else if (parseInt(class_duration_list[0]) >= 11 && parseInt(class_duration_list[0]) <= 13 && !is_first_evening_class_set) {
+                    // Class started in the evening
+                    is_first_evening_class_set = true;
+                    if (parseInt($("#afternoon_first_class_trigger").val()) != 0) {
+                      Tvalarm = {
+                        trigger: parseInt($("#evening_first_class_trigger").val()),
+                        description: "alarm-evening-first-class"
+                      };
+                    }
+                  } else {
+                    // Normal class
+                    if (parseInt($("#normal_trigger").val()) != 0) {
+                      Tvalarm = {
+                        trigger: parseInt($("#normal_trigger").val()),
+                        description: "alarm-normal-class"
+                      };
+                    }
+                  }
                 }
               
                 if (is_convert_to_tc) {
@@ -602,8 +820,8 @@
                   Tlocation = converter(Tlocation);
                 }
               
-                console.log(Tsubject, Tdescription, Tlocation, Tbegin, Tend, Trrule);
-                cal.addEvent(Tsubject, Tdescription, Tlocation, Tbegin, Tend, Trrule);
+                console.log(Tsubject, Tdescription, Tlocation, Tbegin, Tend, Trrule, Tvalarm);
+                cal.addEvent(Tsubject, Tdescription, Tlocation, Tbegin, Tend, Trrule, Tvalarm);
               
               }
             }
