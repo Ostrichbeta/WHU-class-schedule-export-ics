@@ -4,7 +4,7 @@
 // @name:zh-CN        武大课程表导出为 iCS
 // @name:zh-TW        武大課程表匯出為 iCS
 // @namespace         https://github.com/Ostrichbeta/WHU-class-schedule-export-ics/raw/main/schedule_export.js
-// @version           0.90
+// @version           0.90.1
 // @description       Export your timetable as ics format.
 // @description:zh-CN 导出课表为 ics 格式
 // @description:zh-TW 匯出課表為 ics 格式
@@ -727,10 +727,24 @@
                 let Trrule = {};
                 let Tvalarm = {};
               
-                let single_class_obj = $(j).children().eq(1).children().eq(0);
+                let single_class_obj = $(j).children().eq(($(j).children().filter(":nth-child(1)").attr("rowspan") == undefined ? 0 : 1)).children().eq(0);
               
-                Tsubject = $(single_class_obj).children().filter("span.title").text();
-                let class_duration_list = $(j).children().filter(":nth-child(1)").text().match(/\d+/g); // e.g.: [1, 2]
+                // Detects title, if a class has been modified, the span tag will be changed to u
+                if ($(single_class_obj).children().filter("span.title").size() == 0) {
+                  Tsubject = $(single_class_obj).children().filter("u.title").text();
+                }
+                else
+                {
+                  Tsubject = $(single_class_obj).children().filter("span.title").text();
+                }
+                
+
+                
+                let class_duration_obj = $(j).children().filter(":nth-child(1)")
+                while (class_duration_obj.attr("rowspan") == undefined) { // If a single class' rowspan is not equal to 1, it means there are modifications for this class
+                  class_duration_obj = class_duration_obj.parent().prev().children().filter(":nth-child(1)")
+                }
+                let class_duration_list = class_duration_obj.text().match(/\d+/g); // e.g.: [1, 2]
               
                 for (let k of $(single_class_obj).children().filter(":nth-child(2)").children()) {
                   let class_information_child_text_raw = $(k).text().trim(); // Remove the edge spaces here.

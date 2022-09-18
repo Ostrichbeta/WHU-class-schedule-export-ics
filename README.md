@@ -3,6 +3,9 @@
 Languages: English | [簡體中文](README-SC.md) | [繁體中文](README-TC.md)
 
 ## Changelog
+### v0.90.1 - Sep 18, 2022
+- Fix bugs: Fix an error when a class have multiple slices on page at the same class no. in the same day
+
 ### v0.90 - Sep 5, 2022
 - Add features: now you can add an alert time before the class, and can choose diffrently for the first class in the morning, afternoon and evening.
 
