@@ -4,7 +4,7 @@
 // @name:zh-CN        武大课程表导出为 iCS
 // @name:zh-TW        武大課程表匯出為 iCS
 // @namespace         https://github.com/Ostrichbeta/WHU-class-schedule-export-ics/raw/main/schedule_export.js
-// @version           0.90.1
+// @version           0.90.2
 // @description       Export your timetable as ics format.
 // @description:zh-CN 导出课表为 ics 格式
 // @description:zh-TW 匯出課表為 ics 格式
@@ -724,6 +724,9 @@
                 let Tlocation = "";
                 let Tbegin = "";
                 let Tend = "";
+                let TbeginList = [];
+                let TendList = [];
+                let TuntilList = [];
                 let Trrule = {};
                 let Tvalarm = {};
               
@@ -752,18 +755,34 @@
                 
                   switch (class_information_list[0]) {
                     case "周数":
-                      let week_duration_list = class_information_list[1].match(/\d+/g);
-                      Tbegin = get_start_time(parseInt(week_duration_list[0]), day_in_week, parseInt(class_duration_list[0]));
-                      Tend = get_end_time(parseInt(week_duration_list[0]), day_in_week, parseInt(class_duration_list.length == 1 ? class_duration_list[0] : class_duration_list[1]));
+                      let week_range_list = class_information_list[1].match(/\d+(-\d+)?/g);
+                      let week_duration_list = [];
+                      week_range_list.forEach((item, index, arr) => {
+                        let week_duration_item = item.match(/\d+/g);
+                        if (week_duration_item.length == 0) {
+                          bootbox.alert({
+                            title: (scindex <= tcindex) ? "错误" : "錯誤",
+                            message: (scindex <= tcindex) ? "周数未显示，无法生成！\n脚本只能取得屏幕上所显示的信息，请通过点按左侧齿轮，在菜单中选中「时间」项开启。" : "週數未顯示，無法匯出！\n腳本只能取得螢幕上所顯示的資訊，請通過點按左側齒輪，在彈出選單中選中「時間」項開啟。",
+                            size: 'small'
+                          });
+                          return;
+                        }
+                        let startWeek = week_duration_item[0];
+                        let endWeek = "";
+                        if (week_duration_item.length == 1) {
+                          endWeek = week_duration_item[0];
+                        } else {
+                          endWeek = week_duration_item[1];
+                        }
+                        week_duration_list.push([parseInt(startWeek), parseInt(endWeek)]);
+                      });
+                      for (let item of week_duration_list) {
+                        TbeginList.push(get_start_time(item[0], day_in_week, parseInt(class_duration_list[0])));
+                        TendList.push(get_end_time(item[0], day_in_week, parseInt(class_duration_list.length == 1 ? class_duration_list[0] : class_duration_list[1])));
+                        TuntilList.push(get_end_of_week(parseInt(item[1])));
+                      }
                       Trrule.freq = "WEEKLY";
                       Trrule.interval = 1;
-                      if (week_duration_list.length == 1) {
-                        Trrule.until = get_end_of_week(parseInt(week_duration_list[0]));
-                      }
-                      else
-                      {
-                        Trrule.until = get_end_of_week(parseInt(week_duration_list[1]));
-                      }
                       break;
                     
                     case "上课地点":
@@ -775,15 +794,6 @@
                   }
                 }
               
-                if (Tbegin == "" || Tend == "") {
-                  // If the class week range is unknown, stop the process.
-                  bootbox.alert({
-                    title: (scindex <= tcindex) ? "错误" : "錯誤",
-                    message: (scindex <= tcindex) ? "周数未显示，无法生成！\n脚本只能取得屏幕上所显示的信息，请通过点按左侧齿轮，在菜单中选中「时间」项开启。" : "週數未顯示，無法匯出！\n腳本只能取得螢幕上所顯示的資訊，請通過點按左側齒輪，在彈出選單中選中「時間」項開啟。",
-                    size: 'small'
-                  });
-                  return;
-                }
 
                 // Check if the alarm switch is on, and check if this is the first class
                 if ($('#hasAlarmSwitch') && $('#hasAlarmSwitch').is(":checked")) {
@@ -833,9 +843,12 @@
                   Tdescription = converter(Tdescription);
                   Tlocation = converter(Tlocation);
                 }
-              
-                console.log(Tsubject, Tdescription, Tlocation, Tbegin, Tend, Trrule, Tvalarm);
-                cal.addEvent(Tsubject, Tdescription, Tlocation, Tbegin, Tend, Trrule, Tvalarm);
+                
+                for (let index = 0; index < TbeginList.length; index++) {
+                  Trrule.until = TuntilList[index];
+                  console.log(Tsubject, Tdescription, Tlocation, TbeginList[index], TendList[index], Trrule, Tvalarm);
+                  cal.addEvent(Tsubject, Tdescription, Tlocation, TbeginList[index], TendList[index], Trrule, Tvalarm);
+                }
               
               }
             }
