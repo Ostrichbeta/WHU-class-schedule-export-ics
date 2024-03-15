@@ -2,6 +2,8 @@
 
 Languages: English | [簡體中文](README-SC.md) | [繁體中文](README-TC.md)
 
+[Install](https://greasyfork.org/en/scripts/450318-whu-schedule-export-as-ics-calendar)
+
 ## Changelog
 ### v0.91 - Mar 15, 2024
 - Fix bugs：Cannot check if the class has an interval of more than one week.

@@ -2,6 +2,8 @@
 
 语言: [English](README.md) | 简体中文 | [繁体中文](README-TC.md)
 
+[Install](https://greasyfork.org/en/scripts/450318-whu-schedule-export-as-ics-calendar)
+
 ## 更新日志
 ### v0.91 - Mar 15, 2024
 - 修复 bugs：无法识别单双周课程的问题
