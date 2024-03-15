@@ -4,7 +4,7 @@
 // @name:zh-CN        武大课程表导出为 iCS
 // @name:zh-TW        武大課程表匯出為 iCS
 // @namespace         https://github.com/Ostrichbeta/WHU-class-schedule-export-ics/raw/main/schedule_export.js
-// @version           0.90.2
+// @version           0.91
 // @description       Export your timetable as ics format.
 // @description:zh-CN 导出课表为 ics 格式
 // @description:zh-TW 匯出課表為 ics 格式
@@ -919,7 +919,7 @@
                             let TbeginList = [];
                             let TendList = [];
                             let TuntilList = [];
-                            let Trrule = {};
+                            let TrruleList = [];
                             let Tvalarm = {};
 
                             let single_class_obj = $(j)
@@ -970,10 +970,13 @@
                                 switch (class_information_list[0]) {
                                     case "周数":
                                         let week_range_list =
-                                            class_information_list[1].match(/\d+(-\d+)?/g);
+                                            class_information_list[1].match(/\d+(-\d+)?周(?:\([单双]\))?/g);
                                         let week_duration_list = [];
                                         week_range_list.forEach((item, index, arr) => {
                                             let week_duration_item = item.match(/\d+/g);
+                                            let single_double = item.match(/\([单双]\)/);
+
+                                            let double_interval = false;
                                             if (week_duration_item.length == 0) {
                                                 bootbox.alert({
                                                     title: scindex <= tcindex ? "错误" : "錯誤",
@@ -985,6 +988,9 @@
                                                 });
                                                 return;
                                             }
+                                            if (single_double) {
+                                                double_interval = true;
+                                            }
                                             let startWeek = week_duration_item[0];
                                             let endWeek = "";
                                             if (week_duration_item.length == 1) {
@@ -995,6 +1001,7 @@
                                             week_duration_list.push([
                                                 parseInt(startWeek),
                                                 parseInt(endWeek),
+                                                double_interval
                                             ]);
                                         });
                                         for (let item of week_duration_list) {
@@ -1017,9 +1024,11 @@
                                                 )
                                             );
                                             TuntilList.push(get_end_of_week(parseInt(item[1])));
+                                            let Trrule = {};
+                                            Trrule.freq = "WEEKLY";
+                                            Trrule.interval = item[2] ? 2 : 1;
+                                            TrruleList.push(Trrule);
                                         }
-                                        Trrule.freq = "WEEKLY";
-                                        Trrule.interval = 1;
                                         break;
 
                                     case "上课地点":
@@ -1106,24 +1115,25 @@
                                 Tlocation = converter(Tlocation);
                             }
 
+
                             for (let index = 0; index < TbeginList.length; index++) {
-                                Trrule.until = TuntilList[index];
-                                console.log(
-                                    Tsubject,
-                                    Tdescription,
-                                    Tlocation,
-                                    TbeginList[index],
-                                    TendList[index],
-                                    Trrule,
-                                    Tvalarm
-                                );
+                                TrruleList[index].until = TuntilList[index];
+                                console.log({
+                                    "tsubject": Tsubject,
+                                    "tdescription": Tdescription,
+                                    "tlocation": Tlocation,
+                                    "tbegin": TbeginList[index],
+                                    "tend": TendList[index],
+                                    "trrule": TrruleList[index],
+                                    "tvalarm": Tvalarm
+                                });
                                 cal.addEvent(
                                     Tsubject,
                                     Tdescription,
                                     Tlocation,
                                     TbeginList[index],
                                     TendList[index],
-                                    Trrule,
+                                    TrruleList[index],
                                     Tvalarm
                                 );
                             }

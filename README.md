@@ -3,6 +3,9 @@
 Languages: English | [簡體中文](README-SC.md) | [繁體中文](README-TC.md)
 
 ## Changelog
+### v0.91 - Mar 15, 2024
+- Fix bugs：Cannot check if the class has an interval of more than one week.
+
 ### v0.90.1 - Sep 18, 2022
 - Fix bugs: Fix an error when a class have multiple slices on page at the same class no. in the same day
 
